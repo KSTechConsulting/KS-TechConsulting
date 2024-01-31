@@ -30,8 +30,16 @@ jobs:
            sudo apt-get install -y apache2
            sudo systemctl start apache2
            sudo systemctl enable apache2
-           cd /var/www/html/theme/
+           #cd /var/www/html/theme/
            #sudo mv * /var/www/html/
-           git pull origin main 
-           ./deploy-script.sh
+      - name: 📂 rsync deployments
+        uses: burnett01/rsync-deployments@5.1
+        with:
+          switches: -avzr --delete
+          path: ./*
+          remote_path: /var/www/html/
+          remote_host: "${{ secrets.HOST_DNS }}"
+          remote_user: "${{ secrets.USERNAME }}"
+          remote_key: "${{ secrets.SSH_PRIVATE_KEY }}"     
+          
      
