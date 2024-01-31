@@ -36,9 +36,11 @@ jobs:
            sudo systemctl enable apache2
            #cd /var/www/html/theme/
            #sudo mv * /var/www/html/
-      - name: Commit
+      - name: Create CodeDeploy Deployment
+        id: deploy
         run: |
-          git config --global user.name "GitHub Actions"
-          git add dist/
-          git commit -m "Update dist" || echo "No changes to commit"
-          git push origin main     
+          aws deploy create-deployment \
+            --application-name Git_Application \
+            --deployment-group-name development_gropup \
+            --deployment-config-name CodeDeployDefault.OneAtATime \
+            --github-location repository=${{ github.repository }},commitId=${{ github.sha }}   
