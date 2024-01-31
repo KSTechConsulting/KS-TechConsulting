@@ -9,26 +9,15 @@ jobs:
    name: Deploy to EC2 on master branch push
    runs-on: ubuntu-latest
    steps:
-      - name: Get changed files
-        id: changed-files
-        #uses: tj-actions/changed-files@v42
-        uses: actions/checkout@v4
-      # NOTE: `since_last_remote_commit: true` is implied by default and falls back to the previous local commit.         
-      - name: List all changed files
-        env:
-          ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
-        run: |
-          for file in "$ALL_CHANGED_FILES"; do
-            echo "$file was changed"
-          done   
-      - name: Checkout the files
-        uses: actions/checkout@v4
-      - name: Deploy to Server 1
+      - name: Checkout the code
+        uses: actions/checkout@v4      
+      
+      - name: Deploy to my EC2 instance
         uses: easingthemes/ssh-deploy@main
         env:
          SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
          SOURCE: "./"
-         REMOTE_HOST: ${{ secrets.HOST_DNS }}
+         REMOTE_HOST: "ec2-3-145-89-117.us-east-2.compute.amazonaws.com" #${{ secrets.HOST_DNS }}
          REMOTE_USER: ${{ secrets.USERNAME }}
          TARGET: ${{ secrets.TARGET_DIR }}
       - name: Executing remote ssh commands using ssh key
