@@ -33,7 +33,7 @@ jobs:
            #cd /var/www/html/theme/
            #sudo mv * /var/www/html/
       - name: 📂 rsync deployments
-        uses: burnett01/rsync-deployments@5.1
+        uses: actions/rsync-deployments@5.1
         with:
           switches: -avzr --delete
           path: ./*
@@ -41,22 +41,3 @@ jobs:
           remote_host: ${{ secrets.HOST_DNS }}
           remote_user: ${{ secrets.USERNAME }}
           remote_key:  ${{ secrets.SSH_PRIVATE_KEY }}
-      - name: 📂 Set ownership on remote server
-        run: |
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem
-          chmod 600 private_key.pem
-
-          # Create known_hosts file if it doesn't exist
-          mkdir -p /home/runner/.ssh
-          touch /home/runner/.ssh/known_hosts
-          
-          # Clear old key from known_hosts
-          ssh-keygen -R <3.145.89.117> >> /home/runner/.ssh/known_hosts
-
-          # Run the SSH command
-          #ssh -i private_key.pem -o StrictHostKeyChecking=no ec2-user@<your_ec2_ip_address> \
-          #"sudo chown -R ec2-user:apache /var/www/html/ && chmod 777 -R /var/www/html/storage && chmod -R 777 /var/www/html/<your_project_directory>/<your_code_directory>/bootstrap/cache/ && cd /var/www/html/<your_project_directory>/<your_code_directory>/ && sudo npm install -g vite  && npm install && sudo chown -R ec2-user:apache /var/www/html/<your_project_directory>/ && chmod +x /var/www/html/<your_project_directory>/<your_code_directory>/dev_run.sh"          
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}    
-          
-     
