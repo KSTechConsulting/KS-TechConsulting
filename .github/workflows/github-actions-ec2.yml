@@ -31,6 +31,9 @@ jobs:
            sudo systemctl start apache2
            sudo systemctl enable apache2
            cd /var/www/html/
+           git add .
+           git commit -m “Initial commit”
+           git push
            #git pull origin main
            #sudo mv * /var/www/html/
      
