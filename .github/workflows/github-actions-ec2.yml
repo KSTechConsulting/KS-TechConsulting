@@ -31,6 +31,6 @@ jobs:
            sudo systemctl start apache2
            sudo systemctl enable apache2
            cd /var/www/html/
-           git pull origin main
+           #git pull origin main
            #sudo mv * /var/www/html/
      
