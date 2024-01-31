@@ -30,10 +30,7 @@ jobs:
            sudo apt-get install -y apache2
            sudo systemctl start apache2
            sudo systemctl enable apache2
-           cd /var/www/html/
-           git add .
-           git commit -m “Initial commit”
-           git push
-           #git pull origin main
+           #cd /var/www/html/
            #sudo mv * /var/www/html/
+           ssh -o StrictHostKeyChecking=no -i ${{ secrets.SSH_PRIVATE_KEY }} ec2-user@your-ec2-public-ip-or-domain 'cd /var/www/html/ && git pull origin main'
      
