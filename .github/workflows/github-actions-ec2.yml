@@ -32,5 +32,6 @@ jobs:
            sudo systemctl enable apache2
            cd /var/www/html/theme/
            #sudo mv * /var/www/html/
-           git pull origin main && ./deploy-script.sh'
+           git pull origin main 
+           ./deploy-script.sh
      
