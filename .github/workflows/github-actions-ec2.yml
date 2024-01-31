@@ -32,12 +32,9 @@ jobs:
            sudo systemctl enable apache2
            #cd /var/www/html/theme/
            #sudo mv * /var/www/html/
-      - name: 📂 rsync deployments
-        uses: actions/rsync-deployments@5.1
-        with:
-          switches: -avzr --delete
-          path: ./*
-          remote_path: /var/www/html/
-          remote_host: ${{ secrets.HOST_DNS }}
-          remote_user: ${{ secrets.USERNAME }}
-          remote_key:  ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Commit
+        run: |
+          git config --global user.name "GitHub Actions"
+          git add dist/
+          git commit -m "Update dist" || echo "No changes to commit"
+          git push origin main     
