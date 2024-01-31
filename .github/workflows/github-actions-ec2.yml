@@ -17,7 +17,7 @@ jobs:
         env:
          SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
          SOURCE: "./"
-         REMOTE_HOST: "ec2-3-145-89-117.us-east-2.compute.amazonaws.com" #${{ secrets.HOST_DNS }}
+         REMOTE_HOST: ${{ secrets.HOST_DNS }}
          REMOTE_USER: ${{ secrets.USERNAME }}
          TARGET: ${{ secrets.TARGET_DIR }}
       - name: Executing remote ssh commands using ssh key
@@ -31,6 +31,7 @@ jobs:
            sudo apt-get install -y apache2
            sudo systemctl start apache2
            sudo systemctl enable apache2
-           #cd home
+           cd home
+           git pull origin main
            #sudo mv * /var/www/html/
      
