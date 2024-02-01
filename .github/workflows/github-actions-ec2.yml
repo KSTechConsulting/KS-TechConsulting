@@ -25,12 +25,8 @@ jobs:
               cd ..
               cd ..
               cd /var/www/html/ &&
-              git checkout dev &&
+              git checkout main &&
               git fetch --all &&
-              git reset --hard origin/dev &&
-              git pull origin dev &&
-              sudo npm i &&
-              sudo npm run build &&
-              sudo pm2 stop ./dist/index.js &&
-              sudo pm2 start ./dist/index.js
+              git reset --hard origin/main &&
+              git pull origin main
               ' 
