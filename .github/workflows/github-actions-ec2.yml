@@ -1,49 +1,34 @@
-name: Push-to-EC2
-# Trigger deployment only on push to main branch
+name: Deploy
+
 on:
- push:
-   branches: [main]
- pull_request:
-    branches: [main]
-    
+  push:
+    branches: [ dev ]
+
 jobs:
- deploy:
-   name: Deploy to EC2 on master branch push
-   runs-on: ubuntu-latest
-   if: github.ref == 'refs/heads/main'
-   steps:
-      - name: Checkout the code
-        uses: actions/checkout@v4
-        with:
-          ref: main
-      
-      - name: Deploy to my EC2 instance
-        uses: easingthemes/ssh-deploy@main
-        with:
-          ref: main
+  Deploy:
+    name: Deploy to EC2
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v2 
+      - name: Build & Deploy
         env:
-         SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
-         REMOTE_HOST: ${{ secrets.HOST_DNS }}
-         REMOTE_USER: ${{ secrets.USERNAME }}
-         TARGET: ${{ secrets.TARGET_DIR }}
-      - name: Executing remote ssh commands using ssh key
-        uses: appleboy/ssh-action@master
-        with:
-         host: ${{ secrets.HOST_DNS }}
-         username: ${{ secrets.USERNAME }}
-         key: ${{ secrets.EC2_SSH_KEY }}
-         script: |
-           sudo apt-get -y update
-           sudo apt-get install -y apache2
-           sudo systemctl start apache2
-           sudo systemctl enable apache2
-           #cd /var/www/html/theme/
-           #sudo mv * /var/www/html/
-      - name: Create CodeDeploy Deployment
-        id: deploy
+            PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
+            HOSTNAME: ${{ secrets.HOST_DNS }}
+            USER_NAME: ${{ secrets.USERNAME }}
+      
         run: |
-          aws deploy create-deployment \
-            --application-name application-name \
-            --deployment-group-name AppDeploymentGroupName \
-            --deployment-config-name CodeDeployDefault.OneAtATime \
-            --github-location repository=${{ github.repository }},commitId=${{ github.sha }}  
+          echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
+          ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} '
+
+              # Now we have got the access of EC2 and we will start the deploy .
+              cd /var/www/html/ &&
+              git checkout dev &&
+              git fetch --all &&
+              git reset --hard origin/dev &&
+              git pull origin dev &&
+              sudo npm i &&
+              sudo npm run build &&
+              sudo pm2 stop ./dist/index.js &&
+              sudo pm2 start ./dist/index.js
+              ' 
