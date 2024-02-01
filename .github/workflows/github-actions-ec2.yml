@@ -2,12 +2,15 @@ name: Push-to-EC2
 # Trigger deployment only on push to main branch
 on:
  push:
-   branches:
-     - main
+   branches: [main]
+ pull_request:
+    branches: [main]
+    
 jobs:
  deploy:
    name: Deploy to EC2 on master branch push
    runs-on: ubuntu-latest
+   if: github.ref == 'refs/heads/main'
    steps:
       - name: Checkout the code
         uses: actions/checkout@v4
@@ -36,3 +39,11 @@ jobs:
            sudo systemctl enable apache2
            #cd /var/www/html/theme/
            #sudo mv * /var/www/html/
+      - name: Create CodeDeploy Deployment
+        id: deploy
+        run: |
+          aws deploy create-deployment \
+            --application-name application-name \
+            --deployment-group-name AppDeploymentGroupName \
+            --deployment-config-name CodeDeployDefault.OneAtATime \
+            --github-location repository=${{ github.repository }},commitId=${{ github.sha }}  
