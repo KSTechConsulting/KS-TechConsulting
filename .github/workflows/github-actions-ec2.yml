@@ -1,21 +1,37 @@
-name: Deploy
-
+name: Push-to-EC2
+# Trigger deployment only on push to main branch
 on:
-  push:
+ push:
+   branches: [main]
+ pull_request:
     branches: [main]
-
-jobs:
-  Deploy:
-    name: Deploy to EC2
-    runs-on: ubuntu-latest
     
-    steps:
-      - uses: actions/checkout@v2 
-      - name: Build & Deploy
+jobs:
+ deploy:
+   name: Deploy to EC2 on master branch push
+   runs-on: ubuntu-latest
+   if: github.ref == 'refs/heads/main'
+   steps:
+      - name: Checkout the code
+        uses: actions/checkout@v4
+        with:
+          ref: main
+      
+      - name: Deploy to my EC2 instance
+        uses: easingthemes/ssh-deploy@main
+        with:
+          ref: main
         env:
-            PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
-            HOSTNAME: ${{ secrets.HOST_DNS }}
-            USER_NAME: ${{ secrets.USERNAME }}
+         SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
+         REMOTE_HOST: ${{ secrets.HOST_DNS }}
+         REMOTE_USER: ${{ secrets.USERNAME }}
+         TARGET: ${{ secrets.TARGET_DIR }}
+      - name: Executing remote ssh commands using ssh key
+        uses: appleboy/ssh-action@master
+        with:
+         host: ${{ secrets.HOST_DNS }}
+         username: ${{ secrets.USERNAME }}
+         key: ${{ secrets.EC2_SSH_KEY }}
       
         run: |
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
